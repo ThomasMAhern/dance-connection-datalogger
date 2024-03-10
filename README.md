@@ -6,7 +6,7 @@ Parts required:
 2. $12 - [Adafruit LSM6DSOX 6 DoF Accelerometer and Gyroscope](https://www.adafruit.com/product/4438)
 3. $1 - [Through-Hole Resistors - 10K ohm 5% 1/4W](https://www.adafruit.com/product/2784)
 4. $7 - [LIPO Battery w JST connector - 3.7V 400mAh](https://www.adafruit.com/product/3898) - ensure correct JST polarity - you'll kill the Adalogger :(
-5. $9 - [MicroSD card](https://www.adafruit.com/product/1294) - format to ExFAT32, some don't work with the Adalogger
+5. $9 - [MicroSD card](https://www.adafruit.com/product/1294) - format to ExFAT32, some don't work with the Adalogger **(3hrs = 27MB)**
    * Amazon Basics v30 ✅
    * Gigastone v30 ✅
    * Prograde v60 ✅
