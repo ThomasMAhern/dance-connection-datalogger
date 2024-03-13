@@ -46,8 +46,8 @@ Complete with 200mAh battery:
 ![WhatsApp Image 2024-03-12 at 23 26 24 (1)](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/b4a50347-50c0-482c-90c7-218251f08d90)
 ![WhatsApp Image 2024-03-12 at 23 26 24](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/1b0de71c-5428-4dd4-aa13-6f9be76132c0)
 
-## Future ideas: 
+#### Future ideas: 
 * Show difference between beginner/experienced connection smoothness
 * Classify different patterns based on Accelerometer + Gyro readings
-* Vector Database showing which pro you're connection/patterns/etc. are most similar to
+* Vector Database showing which pro your connection/patterns/etc. are most similar to
 * Quantify connection quality during comps
