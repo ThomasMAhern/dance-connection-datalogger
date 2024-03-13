@@ -45,6 +45,8 @@ Contrasted to the first night where I used KT tape, while it loosened up and I n
 Complete with 200mAh battery:
 ![WhatsApp Image 2024-03-12 at 23 26 24 (1)](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/b4a50347-50c0-482c-90c7-218251f08d90)
 ![WhatsApp Image 2024-03-12 at 23 26 24](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/1b0de71c-5428-4dd4-aa13-6f9be76132c0)
+![Screen Shot 2024-03-13 at 01 27 17](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/ed911205-8805-4879-a1c1-979ba12cbfac)
+
 
 #### Future ideas: 
 * Show difference between beginner/experienced connection smoothness
