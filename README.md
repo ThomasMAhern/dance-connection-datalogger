@@ -29,6 +29,10 @@ If you're new to soldering, I would recommend:
 ## About the data:
 Once you've made some recordings, I use [this Jupyter Notebook](https://github.com/ThomasMAhern/dance-connection-datalogger/blob/main/Dance_Connection_Datalogger_Code.ipynb) to analyze the data and get the interactive graphs.
 
+Here is a short recording showing 8 claps for sync, and then light, medium, and heavy connection against a doorframe:
+![Screen Shot 2024-03-14 at 16 02 28](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/86d82798-1156-4c98-8a1e-156c65f7063d)
+
+
 You want to use KT tape to secure the sensor to your finger. The elastic band I tried kept moving/slipping during even sugar tucks. You can see the result in the 3rd graph as the band kept needing to be adjusted (in this case I feel like it was slowly wrapping around my finger causing slightly more tension:
 ![Screen Shot 2024-03-12 at 23 06 51](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/9dc9c643-998c-4477-b68d-d90084f3cd52)
 
