@@ -33,11 +33,13 @@ Here is a short recording showing 8 claps for sync, and then light, medium, and 
 ![Screen Shot 2024-03-14 at 16 02 28](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/86d82798-1156-4c98-8a1e-156c65f7063d)
 
 
-You want to use KT tape to secure the sensor to your finger. The elastic band I tried kept moving/slipping during even sugar tucks. You can see the result in the 3rd graph as the band kept needing to be adjusted (in this case I feel like it was slowly wrapping around my finger causing slightly more tension:
+
+
+You want to use KT tape to secure the sensor to your finger. The elastic band I tried kept moving/slipping during even sugar tucks. You can see the result in this graph as the band kept needing to be adjusted (in this case I feel like it was slowly wrapping around my finger causing slightly more tension:
 ![Screen Shot 2024-03-14 at 17 54 53](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/b9ca847b-b08a-42a8-bf59-95adc135ba76)
 
 
-These graphs show a single dance, where it kept moving and had to adjust it halfway through - thus ruining a good baseline:
+This graph shows a single dance, where it kept moving and had to adjust it halfway through - thus ruining a good baseline:
 ![Screen Shot 2024-03-14 at 17 54 41](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/2721a046-cee5-482b-8484-1a1487b8aa7d)
 
 
