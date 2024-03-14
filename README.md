@@ -11,7 +11,7 @@ You'll have to solder some of the components together, and then load the code on
 * $7 - [LIPO Battery w JST connector - 3.7V 400mAh](https://www.adafruit.com/product/3898) - ensure correct JST polarity - you'll kill the Adalogger :(
 * $4 - [Force-Sensitive Resistor (FSR)](https://www.adafruit.com/product/166) (still testing out the best ones, but 20kg is best so far)
 * $1 - [Stemma QT JST SH 4-Pin 1.0mm pitch Cable](https://www.adafruit.com/product/4399)
-* $9 - [MicroSD card](https://www.adafruit.com/product/1294) - format to ExFAT32, some don't work with the Adalogger **(3hrs = 27MB)**
+* $9 - [MicroSD card](https://www.adafruit.com/product/1294) - format to ExFAT32, some don't work with the Adalogger **(8MB/hr)**
    * Amazon Basics v30 ✅
    * Gigastone v30 ✅
    * Prograde v60 ✅
