@@ -48,7 +48,7 @@ Contrasted to the first night where I used KT tape, while it loosened up and I n
 
 
 
-
+I'd eventually like to have something similar to [this video](https://youtu.be/6ijArKE8vKU?si=1VSgT_-CmVnYFNdb&t=132).
 
 ## Images:
 Complete with 200mAh battery:
