@@ -62,3 +62,5 @@ Complete with 200mAh battery:
 * Classify different patterns based on Accelerometer + Gyro readings
 * Vector Database showing which pro your connection/patterns/etc. are most similar to
 * Quantify connection quality during comps
+* Marcus S. also suggested the idea for using it to display foot data when pushing into the floor. We could potentially use velostat material as the insert material, or just multiple sensors
+
