@@ -1,11 +1,21 @@
+
+
 // general paramters 
-unsigned long  sdcardbackupinterval = .2 ;  // decide in seconds after how long to write the sensor data to SD card , lesser value increase the backup rate , but also increase drain in battery
+unsigned long sdcardbackupinterval = 0.001 ;  // decide in milliseconds after how long to write the sensor data to SD card , lesser value increase the backup rate , but also increase drain in battery
 
-//BATtery voltage measurement pin is A7 regardless of battery is connected or not
- #define BATpin A7   
-  float    BATvoltage = 0 ;
+// types of FSR used  , only the following ones are supported by code
+enum FSRmodel { RPC18_6KG ,  FSR402_10KG , DF940_20KG  } ; 
 
- // declarations for the Accelerometer + gyro LSM6DSOX sensor
+
+// Select the FSR type  by uncommenting the type you want to use , the rest should remain commented
+const FSRmodel FSRtype = DF940_20KG ; 
+
+
+// Battery voltage measurement pin is A7 regardless of battery is connected or not
+#define BATpin A7   
+float    BATvoltage = 0 ;
+
+// declarations for the Accelerometer + gyro LSM6DSOX sensor
 float AccelX = 0 ;  float  AccelY = 0 ;  float  AccelZ = 0 ; 
 float  GyroX = 0 ;  float  GyroY = 0 ;  float  GyroZ = 0 ; 
 float  Temperature1 = 0  ;
@@ -22,12 +32,12 @@ Adafruit_LSM6DSOX sox;
 #define FSRpin  A0
 #define  SDcardledpin  8  //13 led next to usb port for charging indication  //  08 next to SD card
 
-const int  measuringresistor = 4.7 ;   // set in Kilo Ohms the resistance of the resistor used in Voltage divider circuit
-const int  Vccvoltagedivider = 3.3 ;     //  set in volts the vcc voltage of the voltage divider circuit. in Adalogger M0 this should be 3.3
+const  float  measuringresistor = 10 ;   // set in Kilo Ohms the resistance of the resistor used in Voltage divider circuit
+const  float  Vccvoltagedivider = 3.3 ;     //  set in volts the vcc voltage of the voltage divider circuit. in Adalogger M0 this should be 3.3
 
-float   FSRvoltage =  0 ;
-float   FSRresistance =  0 ;
-float   FSRforce =  0 ;
+double   FSRvoltage =  0 ;
+double  FSRresistance =  0 ;
+double   FSRforce =  0 ;
 
 
 // declarations for the SD Card Usage 
@@ -40,64 +50,66 @@ unsigned long currenttime =  0;
 unsigned long pasttime = 0 ; 
 
 
+ //========================================================================
+// Code to run once at the start                                                                                                                                                                                                                                                                                             TIONS 
+//======================================================================== 
 
 void setup() {
+
   Serial.begin(115200);
    
-// for IMU 
   Serial.println(" Pressure and Acceleration Data Logger online !");
 
-  // IMUsettingsninfo ( )   ; 
-  // IMUreadings ( )  ; 
-
-// FSR FUNCTION CALLS
+// PIN CONFIGURATION
    pinMode( FSRpin , INPUT);
    pinMode( SDcardledpin , OUTPUT) ;
-   
-   // SD CARD FUNCTION CALLS
 
-  /*
+
+ //Donot  comment this as this function also initializes SD card object that will be used to read and write by other functions
+   SDcardfilescompleteinfo ( ) ;   //Initialize SD card , Check and return info on every file on SD Card 
+
+ //Donot uncomment this as this function also initializes the IMU for the rest of the functions
+   IMUsettingsninfo ( )   ; // Initialize IMU, configure settings
+
+
+/*
    Only uncomment the following function to check the specs of your SD card once. 
    For that : keep connected to the USB and open Serial Monitor and then press reset button on the M0 board ,
     some text should appear take screenshot for later USE. 
     then comment the function and upload CODE again.
-   */
-   // SDcardspecscompleteinfo ( ) ;   //Check SD CARD Specs and Info
+*/
+// SDcardspecscompleteinfo ( ) ;   //Initilizes SD card , checks SD CARD Specs and Info 
     
 
-//Donot uncomment this as this function also initializes SD card object that will be used to read and write by other functions
-   SDcardfilescompleteinfo ( ) ;   //Check and return info on every file on SD Card 
- //Donot uncomment this as this function also initializes the IMU for the rest of the functions
-   IMUsettingsninfo ( )   ; 
+ 
+// Uncomment the following set of function calls and comment everything in the loop to test whether everything is working
+  //   FSRfunction ( ) ;
+  //   IMUreadings ( )  ;
+  //   SDcardDatalogger ( )  ;
 
-//    FSRfunction ( ) ;
-//       IMUreadings ( )  ; 
+  //   FSRfunction ( ) ;
+  //   IMUreadings ( )  ;
+  //   SDcardDatalogger ( )  ; 
 
-//  SDcardDatalogger ( )  ;
-//    FSRfunction ( ) ;
-//       IMUreadings ( )  ; 
-//    delay (5000 ) ;
-  
-//    SDcardDatalogger ( )  ; 
-//      FSRfunction ( ) ;
-//         IMUreadings ( )  ; 
-   
-//     SDcardDatalogger ( )  ; 
+  //   FSRfunction ( ) ;
+  //   IMUreadings ( )  ; 
+  //   SDcardDatalogger ( )  ; 
  
 
-//    SDcardsampleread ( )  ;
-  // //   Serial.println(" ---------------");
-  // //  SDcardsamplewrite ( ) ;
-  // //   Serial.println(" --------------");
-  // //  SDcardsampleread ( )  ;
-  
+  //   SDcardsampleread ( )  ;
 
-
+  // FSRAccuracyandRangeChecker (  ) ; 
+ 
 }
+
+ //========================================================================
+// Code to run continuously                                                                                                                                                                                                                                                                                                TIONS 
+//======================================================================== 
 
 void loop() {
 
 //delay (10 ) ;  // uncomment this line only for simulation not for hardware testing 
+
   currenttime  = (millis( )) ; // get the current time in seconds  which is the time since the microcontroller was power ON
   
   if  (  ( currenttime - pasttime ) >= sdcardbackupinterval  ) {
@@ -107,6 +119,7 @@ void loop() {
        FSRfunction ( ) ; 
        IMUreadings ( )  ; 
        SDcardDatalogger ( )  ; 
+
        pasttime = currenttime ; 
 
       Serial.println(" --------------");
@@ -118,21 +131,24 @@ void loop() {
 
 }
 
+//========================================================================
+// FSR function declarations                                                                                                                                                                                                                                                                                                 TIONS 
+//======================================================================== 
 
-// function to read voltage accross the FSR measuring resistor so we can calculate force on the FSR
+//********** A function to read voltage across the FSR measuring resistor so we can calculate force on the FSR ************
 void FSRfunction  ( ) { 
 
   unsigned int  FSRadcvalue  =  analogRead( FSRpin )  ; 
   float    FSRadcvoltage =  (((float)FSRadcvalue*Vccvoltagedivider)/1024);
     
 
-    forcecalculatefunction (FSRadcvoltage)  ; 
-      // map(value, fromLow, fromHigh, toLow, toHigh)
+  forcecalculatefunction (FSRadcvoltage)  ; 
+  // map(value, fromLow, fromHigh, toLow, toHigh)
 
-      //calculate battery Voltage as well 
-    unsigned int  BATadcvalue  =  analogRead( BATpin )  ; 
-   float    BATadcvoltage =   (((float)BATadcvalue*3.3)/1024) ; 
-      BATvoltage   = 2* BATadcvoltage ; 
+  //calculate battery Voltage as well 
+  unsigned int  BATadcvalue  =  analogRead( BATpin )  ; 
+  float    BATadcvoltage =   (((float)BATadcvalue*3.3)/1024) ; 
+  BATvoltage   = 2* BATadcvoltage ; 
 
 
    Serial.print("  FSR voltage =   ");  Serial.print(  FSRadcvoltage );  Serial.println("  Volts   ");
@@ -143,71 +159,364 @@ void FSRfunction  ( ) {
 
 }
 
- // calculates the force corresponding to the measure resistance of force by using the results of polynomial curve fitting which is done based on the data provided by the manufacturers
+ //***************Calculates the force corresponding to the measure resistance of force by using the results of polynomial curve fitting**********
+ // which is done based  on the data provided by the manufacturers
+ // functions calculates force in grams  , need  fsrvoltage in volts , resistances in kilo ohms
  void  forcecalculatefunction (float ADCvolt ) { 
    
     FSRvoltage =  ADCvolt  ;
-    FSRresistance = ( ((Vccvoltagedivider - ADCvolt)*((float)measuringresistor))/ ADCvolt)   ;
+
+    // calculate fsr resistance in  Kilo ohms 
+    FSRresistance = ( ((Vccvoltagedivider - ADCvolt)*((double)measuringresistor))/ ADCvolt)   ;
+      
    
-   
-    if  (FSRresistance >=  7.5  ) { 
-      FSRforce = 0 ;}
-      else   FSRforce = map (FSRresistance , 6.85 ,  0.3797 , 100 , 6000) ;
-    
+
+    switch (FSRtype) { 
+
+     case  RPC18_6KG :  {
+       // Serial.println(" -----------RPC18_6KG------------------------");
+       
+        // if resistance is out of the range of sensor , provide range thresholds as the force values
+        if ( FSRresistance > 7.014   )  {
+          FSRforce = 0 ;
+        }
+        else if ( FSRresistance < 0.3952 ) {
+          FSRforce = 6012 ;
+        }
+        else { 
+           // for obtaining force from a polynomial ( fsr resistance ) first we obtain powers of fsr resistance
+        double X0 = 1  ;   // to be replaced by the last value of polynomial
+        double X1 = FSRresistance ; 
+        double X2 = X1*FSRresistance ;
+        double X3 = X2*FSRresistance ;
+        double X4 = X3*FSRresistance ;
+        double X5 = X4*FSRresistance ;
+        double X6 = X5*FSRresistance ;
+        double X7 = X6*FSRresistance ;
+        double X8 = X7*FSRresistance ;
+
+        double term0 =   18516.9668 *  X0 ;
+        double term1 =  -52224.73998 *  X1 ;
+        double term2 =  65707.8722  *  X2 ;
+        double term3 =  -45050.6923 *  X3 ;
+        double term4 =   18146.0813  *  X4 ;
+        double term5 =   -4397.6420*  X5 ;
+        double term6 =   629.137797  *  X6 ; 
+        double term7 =  -48.8601741057821    *  X7 ; 
+        double term8 =  1.58605326091151    *  X8 ; 
+
+         FSRforce =  abs (term8 + term7 + term6 + term5 + term4 + term3 + term2 + term1 + term0 );
+        }
+
+        break ; 
+       }
+
+
+     case  FSR402_10KG :  {
+      // Serial.println(" -----------FSR402_10KG------------------------");
+       
+         // if resistance is out of the range of sensor , provide range thresholds as the force values
+        if ( FSRresistance > 23.3   )  {
+          FSRforce = 0 ;
+          //FSRforce = 24 ;
+        }
+        else if ( FSRresistance < 0.25 ) {
+          FSRforce = 10216 ;
+        }
+        else { 
+           // for obtaining force from a polynomial ( fsr resistance ) first we obtain powers of fsr resistance
+        double X0 = 1  ;   // to be replaced by the last value of polynomial
+        double X1 = FSRresistance ; 
+        double X2 = X1*FSRresistance ;
+        double X3 = X2*FSRresistance ;
+        double X4 = X3*FSRresistance ;
+        double X5 = X4*FSRresistance ;
+        double X6 = X5*FSRresistance ;
+        double X7 = X6*FSRresistance ;
+        double X8 = X7*FSRresistance ;
+        double X9 = X8*FSRresistance ;
+
+        double term0 =   21697.3  *  X0 ;
+        double term1 = -65364.2 *  X1 ;
+        double term2 = 78857.80 *  X2 ;
+        double term3 =  -47130.5 *  X3 ;
+        double term4 =  15225.9 *  X4 ;
+        double term5 =   -2772 *  X5 ;
+        double term6 =  289.1 *  X6 ; 
+        double term7 =  -16.9979 *  X7 ; 
+        double term8 =  0.5209  *  X8 ; 
+        double term9 =  -0.0064 *  X9 ; 
+
+         FSRforce = abs ( term9 +  term8 + term7 + term6 + term5 + term4 + term3 + term2 + term1 + term0  );
+         
+        } 
+         break ; 
+       }
+
+       default :  //DF940_20KG 
+       {
+       // Serial.println(" -----------DF940_20KG------------------------");
+       
+         // if resistance is out of the range of sensor , provide range thresholds as the force values
+        if ( FSRresistance > 230.496   )  {
+          FSRforce =  0  ;
+         // FSRforce = 155.4017 ;
+        }
+        else if ( FSRresistance < 13.58 ) {
+          FSRforce = 2200 ;
+        }
+        else { 
+           // for obtaining force from a polynomial ( fsr resistance ) first we obtain powers of fsr resistance
+        double X0 = 1  ;   // to be replaced by the last value of polynomial
+        double X1 = FSRresistance ; 
+        double X2 = X1*FSRresistance ;
+        double X3 = X2*FSRresistance ;
+        double X4 = X3*FSRresistance ;
+        double X5 = X4*FSRresistance ;
+        double X6 = X5*FSRresistance ;
+        double X7 = X6*FSRresistance ;
+        
+        
+
+        double term0 =   3518.92445288581*  X0 ;
+        double term1 =  -133.513112589150 *  X1 ;
+        double term2 =    2.91038201152771*  X2 ;
+        double term3 = -0.0397281710120845 *  X3 ;
+        double term4 =  0.000332624122630093*  X4 ;
+        double term5 =   -1.62753044207789e-06 *  X5 ;
+        double term6 =  4.24025439648084e-09 *  X6 ; 
+        double term7 =  -4.52988114956109e-12 *  X7 ; 
+        
+        
+
+         FSRforce =  abs (term7 + term6 + term5 + term4 + term3 + term2 + term1 + term0 );
+         
+        } 
+       }
+    }
  }
 
+  
+//***************Check the current accuracy and range of the FSR setup by **********
+//providing example voltages to the calculating functions and checking the outputs 
+   void FSRAccuracyandRangeChecker ( void ) { 
 
- // this functions makes the writes to the datalog file on SD card
+    Serial.print(  "voltage across measuring resistor  "  ); 
+    Serial.print( "  ,  " );
+    Serial.print(  " FSR Resistance "  ); 
+    Serial.print( "  ,  " );
+    Serial.println(  " FSR Force "  ); 
+   
+    for  ( float  i = 0 ;  i  < 3.30 ;   i = i + 0.05 ) { 
+       
+       forcecalculatefunction ( i   ) ; 
+          delay ( 10  ) ; 
+     
+      Serial.print(  i ); 
+      Serial.print( "  ,  " );
+      Serial.print( FSRresistance ); 
+      Serial.print( "  ,  " );
+      Serial.println( FSRforce ); 
+        
+        }
+   }
+
+
+//========================================================================
+// SD Card function declarations                                                                                                                                                                                                                                                                                                 TIONS 
+//======================================================================== 
+
+ //************** Writes to the datalog file on SD card****************
 void SDcardDatalogger ( ) { 
 
-textFile = SD.open("datalog.txt", FILE_WRITE);
+textFile = SD.open("DATALOG.txt", FILE_WRITE);
   if (textFile) {
-    Serial.println(" Backing up to datalog.txt.....");
+    Serial.println(" Backing up to DATALOG.txt.....");
 
 
-    textFile.print (currenttime)  ;  textFile.print (","); 
-    textFile.print (BATvoltage)  ; textFile.print (",");
+    textFile.print (  currenttime  )  ;  textFile.print (","); 
+    textFile.print (  BATvoltage  )  ; textFile.print (",");
 
-    textFile.print(AccelX); textFile.print (",");
-    textFile.print(AccelY); textFile.print (",");
-    textFile.print(AccelZ); textFile.print (",");
+    textFile.print( AccelX )  ; textFile.print (",");
+    textFile.print (  AccelY  )  ; textFile.print (",");
+    textFile.print( AccelZ)  ; textFile.print (",");
 
-    textFile.print(GyroX); textFile.print (",");
-    textFile.print(GyroY); textFile.print (",");
-    textFile.print(GyroZ); textFile.print (",");
+    textFile.print( GyroX )  ; textFile.print (",");
+    textFile.print (  GyroY  )  ; textFile.print (",");
+    textFile.print( GyroZ )  ; textFile.print (",");
 
-    textFile.print(Temperature1); textFile.print (",");
+    textFile.print( Temperature1 )  ; textFile.print (",");
 
-    textFile.print(FSRvoltage); textFile.print (",");
-    textFile.print(FSRresistance); textFile.print (",");
+    textFile.print (  FSRvoltage  )  ; textFile.print (",");
+    textFile.print( FSRresistance)  ; textFile.print (",");
    
-    textFile.println(FSRforce);
+    textFile.println( FSRforce);
     textFile.close();
      
   } else {
-    Serial.println("error opening datalog.txt!");
+    Serial.println("error opening DATALOG.txt!");
   }
 }
 
-// a function to read everthing from the log file and print it into serial monitor
+//************** Read everthing from the log file and print it into serial monitor************
 void SDcardsampleread ( )  { 
 
   // Example of reading file from the card:
-   textFile = SD.open("datalog.txt");
+   textFile = SD.open("DATALOG.txt");
   if (textFile) {
-    Serial.println(" Reading datalog.txt File ");
+    Serial.println(" Reading DATALOG.txt File ");
     while (textFile.available()) {
       Serial.write(textFile.read());
     }
     textFile.close();
     Serial.println("   ");
   } else {
-    Serial.println("error opening datalog.txt!");
+    Serial.println("error opening DATALOG.txt!");
   }
 
 } 
 
-// function to get readings from the IMU via the I2C bus connection
+
+//***********Initialize SD CARD, Check and Returns information about files on your SD Card by utilizing the SDcardprintDirectory ( ) function *********
+  void SDcardfilescompleteinfo ( ) {
+    
+    File rootdirectory;
+  Serial.print("Initializing SD card... ");
+
+  if (!SD.begin(chipSelectpin)) {
+    Serial.println("Card initialization failed. Program will not proceed!");
+    while (true);
+  }
+
+  Serial.println("initialization done.");
+
+
+Serial.println( "-----------------Info about Files on your SD Card-----------------------------"  );
+
+Serial.println("Files in the card:");
+  rootdirectory = SD.open("/");
+  SDcardprintDirectory(rootdirectory, 0);
+  Serial.println("");
+
+Serial.println( "------------------------------------"  );
+  }
+
+
+// ***********the following function is used to search every folder in your SD card and return info on all files in conjuction with the SDcardfilescompleteinfo( ) function
+void SDcardprintDirectory(File dir, int numTabs) {
+  while (true) {
+
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    for (uint8_t i = 0; i < numTabs; i++) {
+      Serial.print('\t');
+    }
+    Serial.print(entry.name());
+    if (entry.isDirectory()) {
+      Serial.println("/");
+      SDcardprintDirectory(entry, numTabs + 1);
+    } else {
+      // files have sizes, directories do not
+      Serial.print("\t\t");
+      Serial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
+}
+
+
+//***************Check the specifications of your SD Card**************
+void SDcardspecscompleteinfo ( ) { 
+
+Serial.println( "-----------------Information about your SD Card-----------------------------"  );
+// Declare object of utility claasses from the SD card library
+Sd2Card card;
+SdVolume volume;
+SdFile root;
+
+
+ Serial.print("\nInitializing SD card...");
+
+  // we'll use the initialization code from the utility libraries
+  // since we're just testing if the card is working!
+  if (!card.init(SPI_HALF_SPEED, chipSelectpin)) {
+    Serial.println("initialization failed. Things to check:");
+    Serial.println("* is a card inserted?");
+    Serial.println("* is your wiring correct?");
+    Serial.println("* did you change the chipSelect pin to match your shield or module?");
+    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
+    while (1);
+  } else {
+    Serial.println("Wiring is correct and a card is present.");
+  }
+
+  // print the type of card
+  Serial.println();
+  Serial.print("Card type:         ");
+  switch (card.type()) {
+    case SD_CARD_TYPE_SD1:
+      Serial.println("SD1");
+      break;
+    case SD_CARD_TYPE_SD2:
+      Serial.println("SD2");
+      break;
+    case SD_CARD_TYPE_SDHC:
+      Serial.println("SDHC");
+      break;
+    default:
+      Serial.println("Unknown");
+  }
+
+  // Now we will try to open the 'volume'/'partition' - it should be FAT16 or FAT32
+  if (!volume.init(card)) {
+    Serial.println("Could not find FAT16/FAT32 partition.\nMake sure you've formatted the card");
+    while (1);
+  }
+
+  Serial.print("Clusters:          ");
+  Serial.println(volume.clusterCount());
+  Serial.print("Blocks x Cluster:  ");
+  Serial.println(volume.blocksPerCluster());
+
+  Serial.print("Total Blocks:      ");
+  Serial.println(volume.blocksPerCluster() * volume.clusterCount());
+  Serial.println();
+
+  // print the type and size of the first FAT-type volume
+  uint32_t volumesize;
+  Serial.print("Volume type is:    FAT") ;
+  Serial.println(volume.fatType(), DEC) ;
+
+  volumesize = volume.blocksPerCluster();    // clusters are collections of blocks
+  volumesize *= volume.clusterCount();       // we'll have a lot of clusters
+  volumesize /= 2;                           // SD card blocks are always 512 bytes (2 blocks are 1 KB)
+  Serial.print("Volume size (KB):  ");
+  Serial.println(volumesize);
+  Serial.print("Volume size (MB):  ");
+  volumesize /= 1024;
+  Serial.println(volumesize);
+  Serial.print("Volume size (GB):  ");
+  Serial.println((float)volumesize / 1024.0);
+
+  Serial.println("\nFiles found on the card (name, date and size in bytes): ");
+  root.openRoot(volume);
+
+  // list all files in the card with date and size
+  root.ls(LS_R | LS_DATE | LS_SIZE);
+  root.close();
+
+Serial.println( "------------------------------------"  );
+
+} 
+
+//========================================================================
+// Accelerometer / IMU  function declarations                                                                                                                                                                                                                                                                                                 TIONS 
+//======================================================================== 
+
+//******** Get Readings from the IMU via the I2C bus connection**************8
  void IMUreadings ( ) {
 
 
@@ -270,7 +579,7 @@ void SDcardsampleread ( )  {
 
  } 
 
-// following functions intializes , applies settings and prints those settings and specs
+// *******Intializes , applies settings and prints those settings and specs**************8
 // for the accelerometer + gyroscope combo
  void IMUsettingsninfo ( )   { 
 
@@ -409,136 +718,4 @@ void SDcardsampleread ( )  {
 }
 
 
-// Following lines of code checks and returns information about files on your SD Card by utilizing the SDcardprintDirectory ( ) function 
-  void SDcardfilescompleteinfo ( ) {
-    
-    File rootdirectory;
-  Serial.print("Initializing SD card... ");
 
-  if (!SD.begin(chipSelectpin)) {
-    Serial.println("Card initialization failed. Program will not proceed!");
-    while (true);
-  }
-
-  Serial.println("initialization done.");
-
-
-Serial.println( "-----------------Info about Files on your SD Card-----------------------------"  );
-
-Serial.println("Files in the card:");
-  rootdirectory = SD.open("/");
-  SDcardprintDirectory(rootdirectory, 0);
-  Serial.println("");
-
-Serial.println( "------------------------------------"  );
-  }
-
-  // the following function is used to search every folder in your SD card and return info on all files
-void SDcardprintDirectory(File dir, int numTabs) {
-  while (true) {
-
-    File entry =  dir.openNextFile();
-    if (! entry) {
-      // no more files
-      break;
-    }
-    for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print('\t');
-    }
-    Serial.print(entry.name());
-    if (entry.isDirectory()) {
-      Serial.println("/");
-      SDcardprintDirectory(entry, numTabs + 1);
-    } else {
-      // files have sizes, directories do not
-      Serial.print("\t\t");
-      Serial.println(entry.size(), DEC);
-    }
-    entry.close();
-  }
-}
-
-
-// The functions is used to check the specs of your SD card.
-void SDcardspecscompleteinfo ( ) { 
-
-Serial.println( "-----------------Information about your SD Card-----------------------------"  );
-// Declare object of utility claasses from the SD card library
-Sd2Card card;
-SdVolume volume;
-SdFile root;
-
-
- Serial.print("\nInitializing SD card...");
-
-  // we'll use the initialization code from the utility libraries
-  // since we're just testing if the card is working!
-  if (!card.init(SPI_HALF_SPEED, chipSelectpin)) {
-    Serial.println("initialization failed. Things to check:");
-    Serial.println("* is a card inserted?");
-    Serial.println("* is your wiring correct?");
-    Serial.println("* did you change the chipSelect pin to match your shield or module?");
-    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
-    while (1);
-  } else {
-    Serial.println("Wiring is correct and a card is present.");
-  }
-
-  // print the type of card
-  Serial.println();
-  Serial.print("Card type:         ");
-  switch (card.type()) {
-    case SD_CARD_TYPE_SD1:
-      Serial.println("SD1");
-      break;
-    case SD_CARD_TYPE_SD2:
-      Serial.println("SD2");
-      break;
-    case SD_CARD_TYPE_SDHC:
-      Serial.println("SDHC");
-      break;
-    default:
-      Serial.println("Unknown");
-  }
-
-  // Now we will try to open the 'volume'/'partition' - it should be FAT16 or FAT32
-  if (!volume.init(card)) {
-    Serial.println("Could not find FAT16/FAT32 partition.\nMake sure you've formatted the card");
-    while (1);
-  }
-
-  Serial.print("Clusters:          ");
-  Serial.println(volume.clusterCount());
-  Serial.print("Blocks x Cluster:  ");
-  Serial.println(volume.blocksPerCluster());
-
-  Serial.print("Total Blocks:      ");
-  Serial.println(volume.blocksPerCluster() * volume.clusterCount());
-  Serial.println();
-
-  // print the type and size of the first FAT-type volume
-  uint32_t volumesize;
-  Serial.print("Volume type is:    FAT") ;
-  Serial.println(volume.fatType(), DEC) ;
-
-  volumesize = volume.blocksPerCluster();    // clusters are collections of blocks
-  volumesize *= volume.clusterCount();       // we'll have a lot of clusters
-  volumesize /= 2;                           // SD card blocks are always 512 bytes (2 blocks are 1 KB)
-  Serial.print("Volume size (KB):  ");
-  Serial.println(volumesize);
-  Serial.print("Volume size (MB):  ");
-  volumesize /= 1024;
-  Serial.println(volumesize);
-  Serial.print("Volume size (GB):  ");
-  Serial.println((float)volumesize / 1024.0);
-
-  Serial.println("\nFiles found on the card (name, date and size in bytes): ");
-  root.openRoot(volume);
-
-  // list all files in the card with date and size
-  root.ls(LS_R | LS_DATE | LS_SIZE);
-  root.close();
-
-Serial.println( "------------------------------------"  );
-
-} 
