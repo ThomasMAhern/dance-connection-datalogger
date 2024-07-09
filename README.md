@@ -5,7 +5,7 @@ You'll have to solder some of the components together, and then load the code on
 
 
 ## Parts required:
-* $20 - [Adafruit Feather M0 Adalogger](https://www.adafruit.com/product/2796)
+* $15 - [Adafruit Feather RP2040 USB-C Adalogger](https://learn.adafruit.com/adafruit-feather-rp2040-adalogger/overview) (can also use the older [Micro-USB M0 Adalogger](https://www.adafruit.com/product/2796))
 * $12 - [Adafruit LSM6DSOX 6 DoF Accelerometer and Gyroscope](https://www.adafruit.com/product/4438)
 * $1 - [Through-Hole Resistors - 10K ohm 5% 1/4W](https://www.adafruit.com/product/2784)
 * $7 - [LIPO Battery w JST connector - 3.7V 400mAh](https://www.adafruit.com/product/3898) - ensure correct JST polarity - you'll kill the Adalogger :(
