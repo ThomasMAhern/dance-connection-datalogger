@@ -46,7 +46,11 @@ This graph shows a single dance, where it kept moving and had to adjust it halfw
 Contrasted to the first night where I used KT tape, while it loosened up and I needed to adjust it in the beginning, it stayed relatively constant afterwards (This was also using a 6kg sensor):
 ![Screen Shot 2024-03-14 at 17 55 07](https://github.com/ThomasMAhern/dance-connection-datalogger/assets/33540039/f7e81f4d-6f37-4ee3-808e-7a28c7d33b1d)
 
+Here is some accelerometer data for a few sugar pushes:
+![Sugar Push](https://github.com/ThomasMAhern/dance-connection-datalogger/blob/main/sugar_push_accel.jpg)
 
+And for a couple different sugar tucks:
+![Sugar Tuck](https://github.com/ThomasMAhern/dance-connection-datalogger/blob/main/sugar_tuck_accel.jpg)
 
 I'd eventually like to have something similar to [this video](https://youtu.be/6ijArKE8vKU?si=1VSgT_-CmVnYFNdb&t=132).
 
